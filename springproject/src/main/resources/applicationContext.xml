@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" scope="singleton">
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/messenger"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+        <property name="maximumPoolSize" value="10"/>
+        <property name="minimumIdle" value="5"/>
+        <property name="connectionTimeout" value="40000"/>
+        <property name="idleTimeout" value="120000"/>
+        <property name="maxLifetime" value="1200000"/>
+    </bean>
+
+    <bean id="personDao" class="ru.vlsu.ispi.springproject.daos.implementations.PersonDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="messageDao" class="ru.vlsu.ispi.springproject.daos.implementations.MessageDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="chatDao" class="ru.vlsu.ispi.springproject.daos.implementations.ChatDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="notificationDao" class="ru.vlsu.ispi.springproject.daos.implementations.NotificationDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="peopleInChatsDao" class="ru.vlsu.ispi.springproject.daos.implementations.PeopleInChatsDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="blockedUserDao" class="ru.vlsu.ispi.springproject.daos.implementations.BlockedUserDaoImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="AccountService" class="ru.vlsu.ispi.springproject.services.AccountService">
+        <constructor-arg ref="personDao"/>
+    </bean>
+
+    <bean id="NotificationService" class="ru.vlsu.ispi.springproject.services.NotificationService">
+        <constructor-arg ref="notificationDao"/>
+    </bean>
+
+    <bean id="ChatService" class="ru.vlsu.ispi.springproject.services.ChatService">
+        <constructor-arg ref="chatDao"/>
+        <constructor-arg ref="personDao"/>
+        <constructor-arg ref="peopleInChatsDao"/>
+        <constructor-arg ref="messageDao"/>
+    </bean>
+
+    <bean id="ContactService" class="ru.vlsu.ispi.springproject.services.ContactService">
+        <property name="blockedUserDao" ref="blockedUserDao" />
+        <property name="personDao" ref="personDao" />
+    </bean>
+
+    <bean id="AccountController" class="ru.vlsu.ispi.springproject.controllers.AccountController">
+        <constructor-arg ref="AccountService"/>
+    </bean>
+
+    <bean id="ChatController" class="ru.vlsu.ispi.springproject.controllers.ChatController">
+        <constructor-arg ref="ChatService"/>
+    </bean>
+
+    <bean id="ContactController" class="ru.vlsu.ispi.springproject.controllers.ContactController">
+        <constructor-arg ref="ContactService"/>
+    </bean>
+
+    <bean id="NotificationController" class="ru.vlsu.ispi.springproject.controllers.NotificationController">
+        <constructor-arg ref="NotificationService"/>
+    </bean>
+</beans>
